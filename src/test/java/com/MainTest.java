@@ -1,7 +1,6 @@
-package main.java;
+package com;
 
-import com.PlateVerifierClass;
-import com.PlateVerifierInterface;
+
 import org.junit.Assert;
 import org.junit.Test;
 
