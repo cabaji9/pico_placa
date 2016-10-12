@@ -1,5 +1,6 @@
 package com;
 
+import com.constants.MessagesEnum;
 import com.vo.TimeVo;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,7 +23,7 @@ public class PlateVerifierCommon {
 
     protected boolean isNumber(String numberStr) {
         boolean isNumber = false;
-        if (numberStr != null && !numberStr.isEmpty() && numberStr.length() == 4) {
+        if (numberStr != null && !numberStr.isEmpty()) {
             isNumber = StringUtils.isNumeric(numberStr);
         }
         return isNumber;
@@ -36,7 +37,7 @@ public class PlateVerifierCommon {
             String dateInString = dateStr;
             try {
                 date = formatter.parse(dateInString);
-                System.out.println(" THE DATE INPUT IS: " + formatter.format(date));
+                System.out.println(MessagesEnum.DATE_INPUT_MSG.getMsg() + formatter.format(date));
             } catch (ParseException e) {
                 //do nothing
             }
@@ -45,7 +46,7 @@ public class PlateVerifierCommon {
 
     }
 
-    protected TimeVo obtainTimeDouble(String timeStr) {
+    protected TimeVo obtainTimeDouble(String timeStr) throws Exception {
         TimeVo timeVo = null;
         if (timeStr != null && !timeStr.isEmpty()) {
             try {
@@ -60,16 +61,17 @@ public class PlateVerifierCommon {
                             timeVo = new TimeVo();
                             timeVo.setHour(hourInt);
                             timeVo.setMinute(minutesInt);
-                            System.out.println("YOUR TIME IS: " + timeVo.getHour() + ":" + timeVo.getMinute());
+                            System.out.println(MessagesEnum.TIME_INPUT_MSG.getMsg() + timeVo.getHour() + ":" + timeVo.getMinute());
                         } else {
-                            logger.log(Level.SEVERE, "MINUTE MUST BE IN RANGE OF 0 TO 59");
+                            throw new Exception("MINUTE MUST BE IN RANGE OF 0 TO 59");
+
                         }
                     } else {
-                        logger.log(Level.SEVERE, "HOUR MUST BE IN RANGE OF 0 TO 24");
+                        throw new Exception("HOUR MUST BE IN RANGE OF 0 TO 24");
                     }
                 }
             } catch (Exception e) {
-                //do nothing.
+                throw new Exception(e.getMessage());
             }
         }
         return timeVo;

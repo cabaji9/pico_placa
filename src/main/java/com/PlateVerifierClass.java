@@ -1,40 +1,46 @@
 package com;
 
+import com.constants.MessagesEnum;
 import com.constants.PlateAllowedDateEnum;
 import com.constants.PlateAllowedTimeEnum;
 import com.vo.PlateVo;
 import com.vo.TimeVo;
 
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by HW on 10/11/16.
  */
 public class PlateVerifierClass extends PlateVerifierCommon implements PlateVerifierInterface {
 
-    private static Logger logger = Logger.getLogger(PlateVerifierClass.class.getName());
-
     public String verifyPlate(String plate, String date, String time) {
         //date should be DD/MM/YYYY example : 20/05/1981
         //time should be HH:MM
-        System.out.println("THE PROGRAM WILL VERIFY IF YOU CAN TAKE YOUR CAR");
-        String msgToUser = "YOU CAN CIRCULATE WITH YOUR CAR WITHOUT PROBLEMS";
-        PlateVo plateVo = new PlateVo();
-        if (verifyDataAndAssignValues(plate, date, time,plateVo)) {
-            Integer lastDigit = extractLastDigit(plateVo.getPlateInt());
-            Integer dayOfWeek = getDayOfWeek(plateVo.getDateObj());
-            PlateAllowedDateEnum plateAllowedDateEnum=  obtainDateEnumByDayOfWeek(dayOfWeek);
-            if(plateAllowedDateEnum != null) {
-                System.out.println("DAY OF WEEK: " + plateAllowedDateEnum.name());
-                if (!verifyPlateDigitAllowedOnDay(lastDigit, plateAllowedDateEnum)) {
-                    System.out.println("TODAY ITS PICO Y PLACA DAY IN QUITO FOR YOUR CAR.");
-                    if (!verifyTimeAllowed(plateVo.getTimeVo())) {
-                        msgToUser = "YOU MUST NOT TAKE OUT YOUR CAR YOU ARE IN PICO Y PLACA TIME ZONE. " + plateVo.getTimeVo().toString();
+        System.out.println(MessagesEnum.PRIMARY_MSG.getMsg());
+        String msgToUser = "";
+        try {
+
+            PlateVo plateVo = new PlateVo();
+
+            if (verifyDataAndAssignValues(plate, date, time, plateVo)) {
+                Integer lastDigit = extractLastDigit(plateVo.getPlateInt());
+                Integer dayOfWeek = getDayOfWeek(plateVo.getDateObj());
+                PlateAllowedDateEnum plateAllowedDateEnum = obtainDateEnumByDayOfWeek(dayOfWeek);
+                if (plateAllowedDateEnum != null) {
+                    System.out.println(MessagesEnum.DAY_OF_WEEK_MSG.getMsg() + plateAllowedDateEnum.name());
+                    if (!verifyPlateDigitAllowedOnDay(lastDigit, plateAllowedDateEnum)) {
+                        System.out.println(MessagesEnum.PICO_PLACA_HAS_MSG.getMsg());
+                        if (!verifyTimeAllowed(plateVo.getTimeVo())) {
+                            msgToUser = MessagesEnum.PICO_PLACA_WARNING_MSG.getMsg() + plateVo.getTimeVo().toString();
+                        }
                     }
                 }
             }
+            if (msgToUser.isEmpty()) {
+                msgToUser = MessagesEnum.PICO_PLACA_SAFE_MSG.getMsg();
+            }
+        }catch(Exception e){
+            msgToUser = e.getMessage();
         }
         return msgToUser;
     }
@@ -65,7 +71,7 @@ public class PlateVerifierClass extends PlateVerifierCommon implements PlateVeri
             }
             if(timeAllowed == true){
                 if(betweenDate(toSearchDate,warningStart,morninStart)){
-                    System.out.println("THING ABOUT WHAT YOU ARE DOING YOU HAVE ONLY "+ obtainMinutesDifference(morninStart,toSearchDate) +" MINS TO BEAT THE PICO Y PLACA");
+                    System.out.println(MessagesEnum.PICO_PLACA_BEAT_MSG_ONE.getMsg() + obtainMinutesDifference(morninStart, toSearchDate) + MessagesEnum.PICO_PLACA_BEAT_MSG_TWO.getMsg());
                 }
             }
         }
@@ -79,7 +85,7 @@ public class PlateVerifierClass extends PlateVerifierCommon implements PlateVeri
             }
             if(timeAllowed == true){
                 if(betweenDate(toSearchDate,warningStart,afternoonDateStart)){
-                    System.out.println("THING ABOUT WHAT YOU ARE DOING YOU HAVE ONLY "+ obtainMinutesDifference(afternoonDateStart,toSearchDate)+" MINS TO BEAT THE PICO Y PLACA");
+                    System.out.println(MessagesEnum.PICO_PLACA_THING_MSG_ONE.getMsg() + obtainMinutesDifference(afternoonDateStart, toSearchDate) + MessagesEnum.PICO_PLACA_THING_MSG_TWO.getMsg());
                 }
             }
         }
@@ -90,11 +96,11 @@ public class PlateVerifierClass extends PlateVerifierCommon implements PlateVeri
 
 
 
-    private boolean verifyDataAndAssignValues(String plate, String date, String time,PlateVo plateVo) {
+    private boolean verifyDataAndAssignValues(String plate, String date, String time,PlateVo plateVo) throws Exception{
         boolean verified = false;
         if (isNumber(plate)) {
             plateVo.setPlateInt(Integer.parseInt(plate));
-            System.out.println("YOUR PLATE NUMBER IS: " + plate);
+            System.out.println(MessagesEnum.PLATE_NUMBER_MSG.getMsg() + plate);
             plateVo.setDateObj(obtainDateObj(date));
             if (plateVo.getDateObj() != null) {
                 plateVo.setTimeVo(obtainTimeDouble(time));
@@ -102,13 +108,13 @@ public class PlateVerifierClass extends PlateVerifierCommon implements PlateVeri
                     verified = true;
 
                 } else {
-                    logger.log(Level.SEVERE, "YOU DIDNT INPUT A CORRECT TIME REMEMBER THIS IS THE FORMAT HH:MM " + time);
+                    throw new Exception(MessagesEnum.ERROR_TIME_WRONG_MSG.getMsg() + time);
                 }
             } else {
-                logger.log(Level.SEVERE, "YOU DIDNT INPUT A CORRECT DATE REMEMBER THIS IS THE FORMAT dd/MM/yyyy: " + date);
+                throw new Exception(MessagesEnum.ERROR_DATE_WRONG_MSG.getMsg()+ date);
             }
         } else {
-            logger.log(Level.SEVERE, "YOUR VEHICLE PLATE ITS NOT A NUMBER: " + plate);
+            throw new Exception(MessagesEnum.PLATE_ERROR_MSG.getMsg() + plate);
         }
         return verified;
     }
