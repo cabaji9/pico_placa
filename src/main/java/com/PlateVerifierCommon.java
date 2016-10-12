@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +36,7 @@ public class PlateVerifierCommon {
             String dateInString = dateStr;
             try {
                 date = formatter.parse(dateInString);
-                logger.info(" THE DATE INPUT IS: " + formatter.format(date));
+                System.out.println(" THE DATE INPUT IS: " + formatter.format(date));
             } catch (ParseException e) {
                 //do nothing
             }
@@ -59,6 +60,7 @@ public class PlateVerifierCommon {
                             timeVo = new TimeVo();
                             timeVo.setHour(hourInt);
                             timeVo.setMinute(minutesInt);
+                            System.out.println("YOUR TIME IS: " + timeVo.getHour() + ":" + timeVo.getMinute());
                         } else {
                             logger.log(Level.SEVERE, "MINUTE MUST BE IN RANGE OF 0 TO 59");
                         }
@@ -95,7 +97,7 @@ public class PlateVerifierCommon {
         String plateStr = plate.toString();
         char lastDigit= plateStr.charAt(plateStr.length() - 1);
         Integer lastDigitInt =  Character.getNumericValue(lastDigit);
-        logger.info("YOUR PLATE LAST DIGIT IS: "+ lastDigitInt);
+        System.out.println("YOUR PLATE LAST DIGIT IS: "+ lastDigitInt);
         return lastDigitInt;
 
     }
@@ -108,5 +110,35 @@ public class PlateVerifierCommon {
         return dayOfWeek;
     }
 
+
+    protected Date getDate(Integer hour, Integer minute){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.set(Calendar.HOUR,hour);
+        cal.set(Calendar.MINUTE,minute);
+        cal.set(Calendar.SECOND,0);
+        return cal.getTime();
+    }
+
+
+    protected  boolean betweenDate(Date date, Date dateStart, Date dateEnd) {
+        if (date != null && dateStart != null && dateEnd != null) {
+            if (date.after(dateStart) && date.before(dateEnd)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+
+    protected Long obtainMinutesDifference(Date d2, Date d1){
+        long diff = d2.getTime() - d1.getTime();//as given
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(diff)+1;
+        return minutes;
+
+    }
 
 }

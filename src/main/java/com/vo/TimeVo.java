@@ -23,4 +23,9 @@ public class TimeVo {
     public void setMinute(Integer minute) {
         this.minute = minute;
     }
+
+    @Override
+    public String toString() {
+        return "THE TIME IS: "+ hour + ":" + minute;
+    }
 }
