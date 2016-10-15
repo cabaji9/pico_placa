@@ -135,7 +135,7 @@ public class PlateVerifierCommon {
         return false;
     }
 
-    /**MENSAJE */
+    /**MENSAJE lasdjfalkdsjflk */
     protected Long obtainMinutesDifference(Date d2, Date d1){
         long diff = d2.getTime() - d1.getTime();//as given
         long minutes = TimeUnit.MILLISECONDS.toMinutes(diff)+1;
